@@ -8,7 +8,10 @@ import org.lapysh.service.account.model.account.create.AccountCreateRequest;
 import org.lapysh.service.account.model.account.create.AccountCreateResponse;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.http.HttpStatus;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +45,7 @@ public class AccountService {
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
+    @Retryable(value = CannotAcquireLockException.class, maxAttempts = 100, backoff = @Backoff(delay = 100))
     @CacheEvict(value = "balances", key = "#accountId")
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void changeBalance(String accountId, AccountBalanceChangeRequest request) {
