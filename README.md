@@ -98,7 +98,7 @@ Response `204 No Content` when successful or `400 Bad Request` in case, when bal
 
 `docker-compose up --build`
 
-# Nice to have:
+# Further development:
 - Cover by unit tests controller layer (check validations);
 - Set up logging;
 - Localize errors;
